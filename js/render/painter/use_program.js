@@ -2,7 +2,7 @@
 
 var assert = require('assert');
 var util = require('../../util/util');
-var shaders = require('mapbox-gl-shaders');
+var shaders = require('../../../../mapbox-gl-shaders-fork');
 
 var utilSource = shaders.util;
 
