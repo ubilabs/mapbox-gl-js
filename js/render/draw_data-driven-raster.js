@@ -44,7 +44,7 @@ function drawRasterTile(painter, source, layer, coord) {
     var tile = source.getTile(coord);
     var posMatrix = painter.transform.calculatePosMatrix(coord, source.maxzoom);
 
-    var program = painter.useProgram('raster');
+    var program = painter.useProgram('data-driven-raster');
     gl.uniformMatrix4fv(program.u_matrix, false, posMatrix);
 
     // color parameters
@@ -59,17 +59,22 @@ function drawRasterTile(painter, source, layer, coord) {
 
     var parentScaleBy, parentTL;
 
+    // Bind tile.texture to TEXTURE0
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, tile.texture);
 
+    // ACTIVATE TEXTURE1
     gl.activeTexture(gl.TEXTURE1);
 
     if (parentTile) {
+        // Bind parent.texture to TEXTURE1
         gl.bindTexture(gl.TEXTURE_2D, parentTile.texture);
         parentScaleBy = Math.pow(2, parentTile.coord.z - tile.coord.z);
         parentTL = [tile.coord.x * parentScaleBy % 1, tile.coord.y * parentScaleBy % 1];
 
     } else {
+        // OR: Bind tile.texture to TEXTURE1 as well and set parentTile opacity
+        // to zero.
         gl.bindTexture(gl.TEXTURE_2D, tile.texture);
         opacities[1] = 0;
     }
