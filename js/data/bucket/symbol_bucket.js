@@ -62,11 +62,11 @@ var layoutVertexArrayType = new Bucket.VertexArrayType([{
 }, {
     name: 'a_data1',
     components: 4,
-    type: 'Uint8'
+    type: 'Uint16'
 }, {
     name: 'a_data2',
     components: 2,
-    type: 'Uint8'
+    type: 'Uint16'
 }]);
 
 var elementArrayType = new Bucket.ElementArrayType();
