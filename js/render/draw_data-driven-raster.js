@@ -50,6 +50,8 @@ function drawRasterTile(painter, source, layer, coord) {
     // color parameters
     gl.uniform1f(program.u_brightness_low, layer.paint['raster-brightness-min']);
     gl.uniform1f(program.u_brightness_high, layer.paint['raster-brightness-max']);
+    gl.uniform1f(program.u_data_min, layer.paint['raster-data-min']);
+    gl.uniform1f(program.u_data_max, layer.paint['raster-data-max']);
     gl.uniform1f(program.u_saturation_factor, saturationFactor(layer.paint['raster-saturation']));
     gl.uniform1f(program.u_contrast_factor, contrastFactor(layer.paint['raster-contrast']));
     gl.uniform3fv(program.u_spin_weights, spinWeights(layer.paint['raster-hue-rotate']));
@@ -59,11 +61,11 @@ function drawRasterTile(painter, source, layer, coord) {
 
     var parentScaleBy, parentTL;
 
-    // Bind tile.texture to TEXTURE0
+    // ACTIVATE TEXTURE UNITE 0
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, tile.texture);
 
-    // ACTIVATE TEXTURE1
+    // ACTIVATE TEXTURE UNITE 1
     gl.activeTexture(gl.TEXTURE1);
 
     if (parentTile) {
@@ -79,6 +81,18 @@ function drawRasterTile(painter, source, layer, coord) {
         opacities[1] = 0;
     }
 
+    // ACTIVATE TEXTURE UNIT 2
+    var lookUpTexture = gl.createTexture();
+    var textureCanvas = layer.paint['raster-lookup-texture'];
+    gl.activeTexture(gl.TEXTURE2);
+    gl.bindTexture(gl.TEXTURE_2D, lookUpTexture);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, textureCanvas);
+    lookUpTexture.size = textureCanvas.width;
+
     // cross-fade parameters
     gl.uniform2fv(program.u_tl_parent, parentTL || [0, 0]);
     gl.uniform1f(program.u_scale_parent, parentScaleBy || 1);
@@ -87,6 +101,7 @@ function drawRasterTile(painter, source, layer, coord) {
     gl.uniform1f(program.u_opacity1, opacities[1]);
     gl.uniform1i(program.u_image0, 0);
     gl.uniform1i(program.u_image1, 1);
+    gl.uniform1i(program.u_image2, 2);
 
     var buffer = tile.boundsBuffer || painter.rasterBoundsBuffer;
     var vao = tile.boundsVAO || painter.rasterBoundsVAO;
