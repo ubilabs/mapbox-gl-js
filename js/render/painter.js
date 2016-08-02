@@ -187,6 +187,7 @@ var draw = {
     line: require('./draw_line'),
     fill: require('./draw_fill'),
     raster: require('./draw_raster'),
+    'data-driven-raster': require('./draw_data-driven-raster'),
     background: require('./draw_background'),
     debug: require('./draw_debug')
 };
